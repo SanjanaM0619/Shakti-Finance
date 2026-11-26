@@ -1,0 +1,19 @@
+# Dependencies & build
+node_modules/
+dist/
+build/
+
+# Environment & secrets
+.env
+.env.local
+
+# SQLite database & uploaded receipts
+data/
+uploads/
+*.sqlite
+*.db
+
+# Logs & OS
+*.log
+.DS_Store
+Thumbs.db
