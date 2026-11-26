@@ -1,0 +1,9 @@
+{
+  "name": "Shakti Finance",
+  "short_name": "Shakti Finance",
+  "description": "Integrated Financial Management, Intelligence & Government Support Platform for Women Entrepreneurs",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#f8fafc",
+  "theme_color": "#2563eb"
+}

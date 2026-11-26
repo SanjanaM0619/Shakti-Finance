@@ -304,9 +304,38 @@ export const AppShell: React.FC = () => {
           </div>
         )}
 
-        <main className="flex-1 p-4 sm:p-6 lg:p-8 max-w-7xl w-full mx-auto">
+        <main className="flex-1 p-4 sm:p-6 lg:p-8 pb-24 lg:pb-8 max-w-7xl w-full mx-auto">
           <Outlet />
         </main>
+
+        {/* Mobile Bottom Quick Action Bar */}
+        <nav
+          aria-label="Mobile Quick Navigation"
+          className="lg:hidden fixed bottom-0 inset-x-0 z-30 bg-white border-t border-slate-200 grid grid-cols-4 h-16"
+        >
+          {[
+            { to: '/dashboard', label: 'Home', icon: LayoutDashboard },
+            { to: '/voice', label: 'Voice', icon: Mic },
+            { to: '/sales', label: 'Sales', icon: TrendingUp },
+            { to: '/schemes', label: 'Schemes', icon: Landmark },
+          ].map((item) => {
+            const Icon = item.icon;
+            return (
+              <NavLink
+                key={item.to}
+                to={item.to}
+                className={({ isActive }) =>
+                  `flex flex-col items-center justify-center gap-0.5 text-[11px] font-medium ${
+                    isActive ? 'text-blue-700 bg-blue-50/50' : 'text-slate-500'
+                  }`
+                }
+              >
+                <Icon className="w-4 h-4" />
+                <span>{item.label}</span>
+              </NavLink>
+            );
+          })}
+        </nav>
       </div>
     </div>
   );
