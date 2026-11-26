@@ -1,8 +1,8 @@
 import React, { useEffect, useState, useCallback } from 'react';
-import { FileSpreadsheet, Plus, Trash2, Upload, Repeat } from 'lucide-react';
+import { FileSpreadsheet, Download, Plus, Trash2, Upload, Repeat } from 'lucide-react';
 import { apiFetch, formatInr } from '../lib/api';
 import { useAuth } from '../context/AuthContext';
-import { exportTransactionsCsv } from '../lib/exportUtils';
+import { exportLedgerReportPdf, exportTransactionsCsv } from '../lib/exportUtils';
 import { FinancialSummary, Transaction } from '../types';
 
 const EXPENSE_CATEGORIES = [
@@ -19,7 +19,7 @@ const EXPENSE_CATEGORIES = [
 ];
 
 export const ExpensesPage: React.FC = () => {
-  const { isOnline, queueOfflineTx } = useAuth();
+  const { businessProfile, isOnline, queueOfflineTx } = useAuth();
   const [transactions, setTransactions] = useState<Transaction[]>([]);
   const [summary, setSummary] = useState<FinancialSummary | null>(null);
   const [suppliers, setSuppliers] = useState<Array<{ id: string; name: string }>>([]);
@@ -136,13 +136,30 @@ export const ExpensesPage: React.FC = () => {
             Track operating costs, recurring overheads, supplier credit bills, and receipt uploads.
           </p>
         </div>
-        <button
-          type="button"
-          onClick={() => exportTransactionsCsv(transactions, 'shakti-expenses-report.csv')}
-          className="btn-secondary text-xs"
-        >
-          <FileSpreadsheet className="w-4 h-4" /> Export Expenses CSV
-        </button>
+        <div className="flex flex-wrap gap-2">
+          <button
+            type="button"
+            onClick={() => exportTransactionsCsv(transactions, 'shakti-expenses-report.csv')}
+            className="btn-secondary text-xs"
+          >
+            <FileSpreadsheet className="w-4 h-4" /> Export CSV
+          </button>
+          <button
+            type="button"
+            onClick={() =>
+              exportLedgerReportPdf(
+                'Expense Breakdown Report',
+                businessProfile?.business_name || 'Shakti Enterprise',
+                ['Date', 'Description', 'Category', 'Method', 'Amount (INR)'],
+                transactions.map((t) => [t.tx_date, t.item_name, t.category, t.payment_method, t.amount]),
+                `shakti-expenses-${new Date().toISOString().slice(0, 10)}.pdf`
+              )
+            }
+            className="btn-primary text-xs"
+          >
+            <Download className="w-4 h-4" /> Export PDF
+          </button>
+        </div>
       </div>
 
       <div className="grid lg:grid-cols-12 gap-6">

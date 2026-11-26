@@ -172,3 +172,30 @@ export function exportReadinessReportPdf(report: any) {
 
   doc.save(`shakti-readiness-report-${new Date().toISOString().slice(0, 10)}.pdf`);
 }
+
+export function exportLedgerReportPdf(
+  title: string,
+  businessName: string,
+  headers: string[],
+  rows: Array<Array<string | number>>,
+  filename: string
+) {
+  const doc = new jsPDF();
+  doc.setFontSize(16);
+  doc.setTextColor(29, 78, 216);
+  doc.text(`Shakti Finance — ${title}`, 14, 18);
+
+  doc.setFontSize(9);
+  doc.setTextColor(71, 85, 105);
+  doc.text(`Enterprise: ${businessName || 'Shakti Enterprise'}   |   Generated: ${new Date().toISOString().slice(0, 10)}`, 14, 25);
+
+  autoTable(doc, {
+    startY: 31,
+    head: [headers],
+    body: rows.map((r) => r.map((v) => String(v ?? ''))),
+    headStyles: { fillColor: [37, 99, 235] },
+    styles: { fontSize: 8.5 },
+  });
+
+  doc.save(filename);
+}

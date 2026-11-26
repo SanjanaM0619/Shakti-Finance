@@ -1,6 +1,8 @@
 import React, { useEffect, useState, useCallback } from 'react';
-import { Truck, Plus, AlertTriangle, CheckCircle2, FileSpreadsheet } from 'lucide-react';
+import { Truck, Plus, AlertTriangle, CheckCircle2, FileSpreadsheet, Download } from 'lucide-react';
 import { apiFetch, formatInr } from '../lib/api';
+import { useAuth } from '../context/AuthContext';
+import { exportLedgerReportPdf } from '../lib/exportUtils';
 
 interface SupplierRecord {
   id: string;
@@ -15,6 +17,7 @@ interface SupplierRecord {
 }
 
 export const SuppliersPage: React.FC = () => {
+  const { businessProfile } = useAuth();
   const [suppliers, setSuppliers] = useState<SupplierRecord[]>([]);
   const [name, setName] = useState('');
   const [phone, setPhone] = useState('');
@@ -83,11 +86,26 @@ export const SuppliersPage: React.FC = () => {
             Manage suppliers, unpaid purchase bills, payment deadlines, and outgoing obligations.
           </p>
         </div>
-        <div className="flex items-center gap-3">
+        <div className="flex flex-wrap items-center gap-2">
           <button type="button" onClick={exportPayablesCsv} className="btn-secondary text-xs">
-            <FileSpreadsheet className="w-4 h-4" /> Export Payables CSV
+            <FileSpreadsheet className="w-4 h-4" /> Export CSV
           </button>
-          <div className="card-surface px-4 py-2.5 text-right">
+          <button
+            type="button"
+            onClick={() =>
+              exportLedgerReportPdf(
+                'Supplier Payables Report',
+                businessProfile?.business_name || 'Shakti Enterprise',
+                ['Supplier', 'Category', 'Phone', 'Outstanding (INR)', 'Overdue (INR)'],
+                suppliers.map((s) => [s.name, s.category, s.phone || '—', s.outstanding, s.overdueAmount]),
+                `shakti-payables-${today}.pdf`
+              )
+            }
+            className="btn-primary text-xs"
+          >
+            <Download className="w-4 h-4" /> Export PDF
+          </button>
+          <div className="card-surface px-4 py-2 text-right">
             <p className="text-xs text-slate-500">Total Unpaid Supplier Bills</p>
             <p className="text-lg font-bold text-slate-900">{formatInr(totalPayable)}</p>
           </div>

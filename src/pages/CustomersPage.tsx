@@ -1,6 +1,8 @@
 import React, { useEffect, useState, useCallback } from 'react';
-import { Users, Plus, AlertTriangle, CheckCircle2, FileSpreadsheet } from 'lucide-react';
+import { Users, Plus, AlertTriangle, CheckCircle2, FileSpreadsheet, Download } from 'lucide-react';
 import { apiFetch, formatInr } from '../lib/api';
+import { useAuth } from '../context/AuthContext';
+import { exportLedgerReportPdf } from '../lib/exportUtils';
 
 interface CustomerRecord {
   id: string;
@@ -16,6 +18,7 @@ interface CustomerRecord {
 }
 
 export const CustomersPage: React.FC = () => {
+  const { businessProfile } = useAuth();
   const [customers, setCustomers] = useState<CustomerRecord[]>([]);
   const [unlinkedBills, setUnlinkedBills] = useState<any[]>([]);
   const [name, setName] = useState('');
@@ -88,11 +91,26 @@ export const CustomersPage: React.FC = () => {
             Track pending customer payments, overdue balances, and partial settlements. Pending credit is excluded from Available Cash until received.
           </p>
         </div>
-        <div className="flex items-center gap-3">
+        <div className="flex flex-wrap items-center gap-2">
           <button type="button" onClick={exportReceivablesCsv} className="btn-secondary text-xs">
-            <FileSpreadsheet className="w-4 h-4" /> Export Receivables CSV
+            <FileSpreadsheet className="w-4 h-4" /> Export CSV
           </button>
-          <div className="card-surface px-4 py-2.5 text-right">
+          <button
+            type="button"
+            onClick={() =>
+              exportLedgerReportPdf(
+                'Customer Receivables Report',
+                businessProfile?.business_name || 'Shakti Enterprise',
+                ['Customer', 'Phone', 'Billed (INR)', 'Paid (INR)', 'Outstanding (INR)', 'Overdue (INR)'],
+                customers.map((c) => [c.name, c.phone || '—', c.totalBilled, c.totalPaid, c.outstanding, c.overdueAmount]),
+                `shakti-receivables-${new Date().toISOString().slice(0, 10)}.pdf`
+              )
+            }
+            className="btn-primary text-xs"
+          >
+            <Download className="w-4 h-4" /> Export PDF
+          </button>
+          <div className="card-surface px-4 py-2 text-right">
             <p className="text-xs text-slate-500">Total Pending Receivables</p>
             <p className="text-lg font-bold text-blue-700">{formatInr(totalReceivable)}</p>
           </div>
