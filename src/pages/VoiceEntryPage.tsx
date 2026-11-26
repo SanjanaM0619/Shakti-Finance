@@ -2,6 +2,7 @@ import React, { useEffect, useRef, useState } from 'react';
 import { Mic, MicOff, Sparkles, CheckCircle2, AlertCircle, Send, Upload } from 'lucide-react';
 import { apiFetch, formatInr } from '../lib/api';
 import { useAuth } from '../context/AuthContext';
+import { t } from '../lib/i18n';
 
 interface ParsedTxDraft {
   entry_kind: 'sale' | 'expense' | 'household_withdrawal' | 'personal_contribution';
@@ -185,10 +186,10 @@ export const VoiceEntryPage: React.FC = () => {
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
           <h1 className="text-2xl font-bold text-slate-900">
-            Voice-First Regional Language Transaction Entry
+            {t(language, 'voiceTitle')}
           </h1>
           <p className="text-sm text-slate-500 mt-0.5">
-            Speak naturally in Kannada or English. Nothing is saved to your ledger until you review and confirm.
+            {t(language, 'voiceSubtitle')}
           </p>
         </div>
 

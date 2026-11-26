@@ -188,6 +188,45 @@ export function deterministicParseTranscript(transcript, language = 'en') {
 }
 
 export async function parseVoiceTransaction({ transcript, language = 'en' }) {
+  const sysInstruction = `Extract structured bookkeeping transactions from Kannada or English natural speech.
+Return ONLY valid JSON: { "transactions": [{ "entry_kind": "sale|expense|household_withdrawal|personal_contribution", "tx_date": "YYYY-MM-DD", "item_name": "string", "category": "string", "quantity": number, "unit_price": number, "amount": number, "payment_method": "cash|upi|bank_transfer|credit" }], "clarificationQuestions": ["string"] }.
+Today is ${new Date().toISOString().slice(0, 10)}. Never invent amounts; ask clarification if missing.`;
+
+  if (process.env.GEMINI_API_KEY) {
+    try {
+      const gemRes = await fetch(
+        `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${encodeURIComponent(process.env.GEMINI_API_KEY)}`,
+        {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            contents: [
+              {
+                role: 'user',
+                parts: [{ text: `${sysInstruction}\n\nLanguage: ${language}. Transcript: ${transcript}` }],
+              },
+            ],
+            generationConfig: { temperature: 0, responseMimeType: 'application/json' },
+          }),
+        }
+      );
+      if (gemRes.ok) {
+        const data = await gemRes.json();
+        const raw = data.candidates?.[0]?.content?.parts?.[0]?.text;
+        if (raw) {
+          const parsed = JSON.parse(raw);
+          return {
+            transactions: Array.isArray(parsed.transactions) ? parsed.transactions : [],
+            clarificationQuestions: Array.isArray(parsed.clarificationQuestions) ? parsed.clarificationQuestions : [],
+            parserMode: 'gemini-llm',
+          };
+        }
+      }
+    } catch {
+      // Fall through to OpenAI or deterministic bilingual parser
+    }
+  }
+
   const openAiKey = process.env.OPENAI_API_KEY;
   if (openAiKey) {
     try {
@@ -202,12 +241,7 @@ export async function parseVoiceTransaction({ transcript, language = 'en' }) {
           temperature: 0,
           response_format: { type: 'json_object' },
           messages: [
-            {
-              role: 'system',
-              content: `Extract structured bookkeeping transactions from Kannada or English natural speech.
-Return JSON: { "transactions": [{ "entry_kind": "sale|expense|household_withdrawal|personal_contribution", "tx_date": "YYYY-MM-DD", "item_name": "string", "category": "string", "quantity": number, "unit_price": number, "amount": number, "payment_method": "cash|upi|bank_transfer|credit" }], "clarificationQuestions": ["string"] }.
-Today is ${new Date().toISOString().slice(0, 10)}. Never invent amounts; ask clarification if missing.`,
-            },
+            { role: 'system', content: sysInstruction },
             { role: 'user', content: `Language: ${language}. Transcript: ${transcript}` },
           ],
         }),

@@ -22,11 +22,12 @@ router.get('/voice/config', (_req, res) => {
   return res.json({
     sarvamConfigured: Boolean(process.env.SARVAM_API_KEY),
     openaiConfigured: Boolean(process.env.OPENAI_API_KEY),
+    geminiConfigured: Boolean(process.env.GEMINI_API_KEY),
     supportedLanguages: ['en', 'kn'],
     note:
-      process.env.SARVAM_API_KEY || process.env.OPENAI_API_KEY
+      process.env.SARVAM_API_KEY || process.env.OPENAI_API_KEY || process.env.GEMINI_API_KEY
         ? 'External Speech/LLM provider active.'
-        : 'Using browser Web Speech API + deterministic bilingual (Kannada/English) extractor. Add SARVAM_API_KEY or OPENAI_API_KEY in .env for cloud audio transcription.',
+        : 'Using browser Web Speech API + deterministic bilingual (Kannada/English) extractor. Add SARVAM_API_KEY, GEMINI_API_KEY, or OPENAI_API_KEY in .env for cloud speech/LLM.',
   });
 });
 

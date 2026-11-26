@@ -31,6 +31,13 @@ export const TRANSLATIONS: Record<Language, Record<string, string>> = {
     offlineMode: 'Offline Mode',
     onlineMode: 'Online & Synced',
     syncNow: 'Sync Queue',
+    addSale: '+ Add Sale',
+    addExpense: '+ Add Expense',
+    voiceTitle: 'Voice-First Regional Language Transaction Entry',
+    voiceSubtitle: 'Speak naturally in Kannada or English. Nothing is saved to your ledger until you review and confirm.',
+    dashboardSubtitle: 'Verified business performance, liquid cash position, and upcoming obligations.',
+    healthCheck: 'Financial Health Check',
+    recentActivity: 'Recent Ledger Activity',
   },
   kn: {
     brand: 'ಶಕ್ತಿ ಫೈನಾನ್ಸ್',
@@ -62,6 +69,13 @@ export const TRANSLATIONS: Record<Language, Record<string, string>> = {
     offlineMode: 'ಆಫ್‌ಲೈನ್ ಮೋಡ್',
     onlineMode: 'ಆನ್‌ಲೈನ್ ಮತ್ತು ಸಿಂಕ್ ಆಗಿದೆ',
     syncNow: 'ಸಿಂಕ್ ಮಾಡಿ',
+    addSale: '+ ಮಾರಾಟ ಸೇರಿಸಿ',
+    addExpense: '+ ಖರ್ಚು ಸೇರಿಸಿ',
+    voiceTitle: 'ಧ್ವನಿ ಆಧಾರಿತ ಪ್ರಾದೇಶಿಕ ಭಾಷಾ ವಹಿವಾಟು ದಾಖಲೆ',
+    voiceSubtitle: 'ಕನ್ನಡ ಅಥವಾ ಇಂಗ್ಲಿಷ್‌ನಲ್ಲಿ ಸಹಜವಾಗಿ ಮಾತನಾಡಿ. ನೀವು ಪರಿಶೀಲಿಸಿ ದೃಢೀಕರಿಸುವವರೆಗೆ ಖಾತೆಗೆ ಉಳಿಸಲಾಗುವುದಿಲ್ಲ.',
+    dashboardSubtitle: 'ಪರಿಶೀಲಿಸಿದ ವ್ಯಾಪಾರ ಕಾರ್ಯಕ್ಷಮತೆ, ಲಭ್ಯ ನಗದು ಮತ್ತು ಬಾಕಿ ಜವಾಬ್ದಾರಿಗಳು.',
+    healthCheck: 'ಹಣಕಾಸು ಆರೋಗ್ಯ ತಪಾಸಣೆ',
+    recentActivity: 'ಇತ್ತೀಚಿನ ವಹಿವಾಟುಗಳು',
   },
 };
 

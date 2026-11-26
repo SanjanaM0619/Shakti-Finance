@@ -70,18 +70,18 @@ export const DashboardPage: React.FC = () => {
             {businessProfile?.business_name || `${user?.name}'s Enterprise`}
           </h1>
           <p className="text-sm text-slate-500 mt-0.5">
-            Verified business performance, liquid cash position, and upcoming obligations.
+            {t(language, 'dashboardSubtitle')}
           </p>
         </div>
         <div className="flex flex-wrap items-center gap-2">
           <Link to="/voice" className="btn-primary">
-            <Mic className="w-4 h-4" /> Voice Entry
+            <Mic className="w-4 h-4" /> {t(language, 'voice')}
           </Link>
           <Link to="/sales" className="btn-secondary">
-            + Add Sale
+            {t(language, 'addSale')}
           </Link>
           <Link to="/expenses" className="btn-secondary">
-            + Add Expense
+            {t(language, 'addExpense')}
           </Link>
         </div>
       </div>
@@ -177,7 +177,7 @@ export const DashboardPage: React.FC = () => {
         <section className="lg:col-span-5 card-surface p-6 space-y-4">
           <div className="flex items-center justify-between">
             <h2 className="font-semibold text-slate-900 flex items-center gap-2">
-              <Activity className="w-4 h-4 text-blue-600" /> Financial Health Check
+              <Activity className="w-4 h-4 text-blue-600" /> {t(language, 'healthCheck')}
             </h2>
             <span className={`px-2.5 py-1 rounded-full text-xs font-semibold border ${healthBadgeStyle}`}>
               {summary.health.status}
@@ -249,7 +249,7 @@ export const DashboardPage: React.FC = () => {
       <div className="grid lg:grid-cols-12 gap-6">
         <section className="lg:col-span-8 card-surface p-6 space-y-4">
           <div className="flex items-center justify-between">
-            <h2 className="font-semibold text-slate-900">Recent Ledger Activity</h2>
+            <h2 className="font-semibold text-slate-900">{t(language, 'recentActivity')}</h2>
             <Link to="/separation" className="text-xs font-semibold text-blue-600 hover:underline">
               Full Business vs Home Ledger →
             </Link>

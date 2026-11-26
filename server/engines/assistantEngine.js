@@ -192,7 +192,38 @@ export async function answerFinancialQuestion(userId, question) {
       'Informational guidance calculated strictly from your recorded Shakti Finance data. Recommendations are not guaranteed financial outcomes or professional tax/legal advice.',
   };
 
-  // Optional LLM narrative polish when OPENAI_API_KEY is configured, strictly grounded in verifiedFactsUsed
+  // Optional LLM narrative polish when GEMINI_API_KEY or OPENAI_API_KEY is configured, strictly grounded in verifiedFactsUsed
+  const sysPrompt = `You are Shakti Finance's financial guide for a woman micro-entrepreneur (${user.name || 'Entrepreneur'}).
+Rewrite the verified calculation summary clearly and empathetically in ${user.preferred_language === 'kn' ? 'Kannada and simple English' : 'simple, encouraging English'}.
+STRICT RULE: Use ONLY the exact numbers provided in Verified Facts and Draft Answer. Never invent transactions, balances, or percentages.`;
+  const userPrompt = `Question: ${q}\nDraft Answer: ${answer}\nVerified Facts: ${JSON.stringify(result.verifiedFactsUsed)}`;
+
+  if (process.env.GEMINI_API_KEY) {
+    try {
+      const gemRes = await fetch(
+        `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${encodeURIComponent(process.env.GEMINI_API_KEY)}`,
+        {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            contents: [{ role: 'user', parts: [{ text: `${sysPrompt}\n\n${userPrompt}` }] }],
+            generationConfig: { temperature: 0.2 },
+          }),
+        }
+      );
+      if (gemRes.ok) {
+        const gemData = await gemRes.json();
+        const polished = gemData.candidates?.[0]?.content?.parts?.[0]?.text?.trim();
+        if (polished) {
+          result.answer = polished;
+          return result;
+        }
+      }
+    } catch {
+      // Fall through to OpenAI or verified deterministic answer
+    }
+  }
+
   if (process.env.OPENAI_API_KEY) {
     try {
       const llmRes = await fetch('https://api.openai.com/v1/chat/completions', {
@@ -205,16 +236,8 @@ export async function answerFinancialQuestion(userId, question) {
           model: 'gpt-4o-mini',
           temperature: 0.2,
           messages: [
-            {
-              role: 'system',
-              content: `You are Shakti Finance's financial guide for a woman micro-entrepreneur (${user.name || 'Entrepreneur'}).
-Rewrite the verified calculation summary clearly and empathetically in ${user.preferred_language === 'kn' ? 'Kannada and simple English' : 'simple, encouraging English'}.
-STRICT RULE: Use ONLY the exact numbers provided in Verified Facts and Draft Answer. Never invent transactions, balances, or percentages.`,
-            },
-            {
-              role: 'user',
-              content: `Question: ${q}\nDraft Answer: ${answer}\nVerified Facts: ${JSON.stringify(result.verifiedFactsUsed)}`,
-            },
+            { role: 'system', content: sysPrompt },
+            { role: 'user', content: userPrompt },
           ],
         }),
       });
