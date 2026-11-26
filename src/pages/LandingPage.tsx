@@ -9,12 +9,14 @@ import {
   LineChart,
   ShieldCheck,
   Sparkles,
+  Globe,
 } from 'lucide-react';
 import { apiFetch } from '../lib/api';
 import { useAuth } from '../context/AuthContext';
+import { t } from '../lib/i18n';
 
 export const LandingPage: React.FC = () => {
-  const { user, loginWithPayload } = useAuth();
+  const { user, language, setLanguage, loginWithPayload } = useAuth();
   const [demoLoading, setDemoLoading] = useState(false);
   const navigate = useNavigate();
 
@@ -46,7 +48,15 @@ export const LandingPage: React.FC = () => {
             </div>
           </div>
 
-          <nav className="flex items-center gap-3">
+          <nav className="flex items-center gap-2.5">
+            <button
+              type="button"
+              onClick={() => setLanguage(language === 'en' ? 'kn' : 'en')}
+              className="inline-flex items-center gap-1.5 px-2.5 py-2 rounded-lg border border-slate-200 bg-white text-xs font-medium text-slate-700 hover:bg-blue-50 hover:text-blue-700 cursor-pointer"
+            >
+              <Globe className="w-3.5 h-3.5 text-blue-600" />
+              {language === 'en' ? 'ಕನ್ನಡ' : 'English'}
+            </button>
             {user ? (
               <Link to="/dashboard" className="btn-primary">
                 Open Dashboard <ArrowRight className="w-4 h-4" />
@@ -54,7 +64,7 @@ export const LandingPage: React.FC = () => {
             ) : (
               <>
                 <Link to="/auth" className="btn-secondary">
-                  Sign In
+                  {t(language, 'signIn')}
                 </Link>
                 <button
                   type="button"
@@ -62,7 +72,7 @@ export const LandingPage: React.FC = () => {
                   disabled={demoLoading}
                   className="btn-primary"
                 >
-                  {demoLoading ? 'Loading Demo...' : 'Explore Live Demo'}
+                  {demoLoading ? 'Loading Demo...' : t(language, 'exploreDemo')}
                 </button>
               </>
             )}
@@ -77,24 +87,22 @@ export const LandingPage: React.FC = () => {
             <div className="lg:col-span-7 space-y-6">
               <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-blue-50 border border-blue-200 text-blue-700 text-xs font-semibold">
                 <ShieldCheck className="w-3.5 h-3.5" />
-                Built for Women Micro-Entrepreneurs, SHGs & Home Businesses
+                {t(language, 'heroBadge')}
               </div>
 
               <h1 className="text-3xl sm:text-5xl font-bold text-slate-900 leading-[1.15]">
-                Clear business finances,{' '}
-                <span className="text-blue-600">intelligent cash forecasts</span>, and verified
-                government support.
+                {t(language, 'heroTitlePrefix')}{' '}
+                <span className="text-blue-600">{t(language, 'heroTitleHighlight')}</span>
+                {t(language, 'heroTitleSuffix')}
               </h1>
 
               <p className="text-base sm:text-lg text-slate-600 max-w-2xl leading-relaxed">
-                Shakti Finance separates household money from business cash, turns Kannada or English
-                voice notes into verified accounting entries, predicts cash shortages before they
-                happen, and matches your enterprise with central and Karnataka schemes.
+                {t(language, 'heroDesc')}
               </p>
 
               <div className="flex flex-wrap items-center gap-3 pt-2">
                 <Link to="/auth?mode=register" className="btn-primary px-6 py-3 text-base">
-                  Create Free Account <ArrowRight className="w-4 h-4" />
+                  {t(language, 'createFreeAccount')} <ArrowRight className="w-4 h-4" />
                 </Link>
                 <button
                   type="button"
@@ -102,7 +110,7 @@ export const LandingPage: React.FC = () => {
                   disabled={demoLoading}
                   className="btn-secondary px-6 py-3 text-base"
                 >
-                  {demoLoading ? 'Opening Demo...' : 'Try Sample Business (Kavya Gruha Udyog)'}
+                  {demoLoading ? 'Opening Demo...' : t(language, 'trySampleDemo')}
                 </button>
               </div>
 

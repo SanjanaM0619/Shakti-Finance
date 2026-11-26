@@ -1,6 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import { LineChart, AlertTriangle, Info, CheckCircle2 } from 'lucide-react';
 import { apiFetch, formatInr } from '../lib/api';
+import { useAuth } from '../context/AuthContext';
+import { t } from '../lib/i18n';
 
 interface ForecastResponse {
   horizonDays: number;
@@ -44,6 +46,7 @@ interface ForecastResponse {
 }
 
 export const ForecastPage: React.FC = () => {
+  const { language } = useAuth();
   const [horizon, setHorizon] = useState<7 | 30 | 90>(30);
   const [data, setData] = useState<ForecastResponse | null>(null);
 
@@ -78,9 +81,9 @@ export const ForecastPage: React.FC = () => {
     <div className="space-y-6">
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-bold text-slate-900">Predictive Cash-Flow Forecasting</h1>
+          <h1 className="text-2xl font-bold text-slate-900">{t(language, 'forecastTitle')}</h1>
           <p className="text-sm text-slate-500 mt-0.5">
-            Forecasts inflows, outflows, and shortage risks using moving averages, exponential smoothing, and scheduled bills.
+            {t(language, 'forecastDesc')}
           </p>
         </div>
 

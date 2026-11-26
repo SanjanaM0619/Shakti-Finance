@@ -89,7 +89,7 @@ test('Surplus engine and Scheme eligibility engine return valid structured class
   assert.equal(surplus.rationale.length, 5);
 
   const schemes = evaluateSchemesForUser(demoId);
-  assert.ok(schemes.length >= 8);
+  assert.ok(schemes.length >= 12);
   const outcomes = new Set(schemes.map((s) => s.evaluation.outcome));
   assert.ok(
     outcomes.has('Potentially eligible') ||

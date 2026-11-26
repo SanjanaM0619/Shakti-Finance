@@ -1,9 +1,12 @@
 import React, { useEffect, useState } from 'react';
 import { Activity, CheckCircle2, AlertTriangle, AlertOctagon, Info } from 'lucide-react';
 import { apiFetch, formatInr } from '../lib/api';
+import { useAuth } from '../context/AuthContext';
+import { t } from '../lib/i18n';
 import { FinancialSummary } from '../types';
 
 export const HealthPage: React.FC = () => {
+  const { language } = useAuth();
   const [summary, setSummary] = useState<FinancialSummary | null>(null);
 
   useEffect(() => {
@@ -40,9 +43,9 @@ export const HealthPage: React.FC = () => {
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-2xl font-bold text-slate-900">Intelligent Financial Health Engine</h1>
+        <h1 className="text-2xl font-bold text-slate-900">{t(language, 'healthTitle')}</h1>
         <p className="text-sm text-slate-500 mt-0.5">
-          Transparent rule-based diagnosis of profitability, liquidity, obligations, and resilience.
+          {t(language, 'healthDesc')}
         </p>
       </div>
 

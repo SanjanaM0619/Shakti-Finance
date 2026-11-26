@@ -1,6 +1,8 @@
 import React, { useState } from 'react';
 import { MessageSquare, Send, ShieldCheck, AlertCircle } from 'lucide-react';
 import { apiFetch } from '../lib/api';
+import { useAuth } from '../context/AuthContext';
+import { t } from '../lib/i18n';
 
 interface AssistantReply {
   question: string;
@@ -24,6 +26,7 @@ const SUGGESTED_QUESTIONS = [
 ];
 
 export const AssistantPage: React.FC = () => {
+  const { language } = useAuth();
   const [question, setQuestion] = useState('');
   const [asking, setAsking] = useState(false);
   const [history, setHistory] = useState<AssistantReply[]>([]);
@@ -46,9 +49,9 @@ export const AssistantPage: React.FC = () => {
   return (
     <div className="max-w-4xl mx-auto space-y-6">
       <div>
-        <h1 className="text-2xl font-bold text-slate-900">Explainable AI Financial Assistant</h1>
+        <h1 className="text-2xl font-bold text-slate-900">{t(language, 'assistantTitle')}</h1>
         <p className="text-sm text-slate-500 mt-0.5">
-          Answers are computed directly from your verified SQLite financial ledger—never guessed or fabricated.
+          {t(language, 'assistantDesc')}
         </p>
       </div>
 

@@ -1,6 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import { PiggyBank, ShieldAlert, CheckCircle2 } from 'lucide-react';
 import { apiFetch, formatInr } from '../lib/api';
+import { useAuth } from '../context/AuthContext';
+import { t } from '../lib/i18n';
 
 interface SurplusResponse {
   availableCash: number;
@@ -19,6 +21,7 @@ interface SurplusResponse {
 }
 
 export const SurplusPage: React.FC = () => {
+  const { language } = useAuth();
   const [data, setData] = useState<SurplusResponse | null>(null);
   const [plan, setPlan] = useState({
     upcoming_obligations: 0,
@@ -77,10 +80,10 @@ export const SurplusPage: React.FC = () => {
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
           <h1 className="text-2xl font-bold text-slate-900">
-            Adaptive Surplus Allocation & Savings Planner
+            {t(language, 'surplusTitle')}
           </h1>
           <p className="text-sm text-slate-500 mt-0.5">
-            Tailored cash envelopes calculated from your verified liquid cash, obligations, and goals.
+            {t(language, 'surplusDesc')}
           </p>
         </div>
         <button type="button" onClick={resetToRecommended} className="btn-secondary text-xs">

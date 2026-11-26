@@ -2,13 +2,14 @@ import React, { useEffect, useState, useCallback } from 'react';
 import { Download, FileSpreadsheet, Plus, Trash2, WifiOff } from 'lucide-react';
 import { apiFetch, formatInr } from '../lib/api';
 import { useAuth } from '../context/AuthContext';
+import { t } from '../lib/i18n';
 import { exportFinancialSummaryPdf, exportTransactionsCsv } from '../lib/exportUtils';
 import { FinancialSummary, Transaction } from '../types';
 
 const SALE_CATEGORIES = ['Snacks', 'Spices', 'Pickles', 'Tailoring', 'Handicrafts', 'Beauty Services', 'Retail', 'Product Sales', 'General'];
 
 export const SalesPage: React.FC = () => {
-  const { businessProfile, isOnline, queueOfflineTx } = useAuth();
+  const { businessProfile, language, isOnline, queueOfflineTx } = useAuth();
   const [transactions, setTransactions] = useState<Transaction[]>([]);
   const [summary, setSummary] = useState<FinancialSummary | null>(null);
   const [customers, setCustomers] = useState<Array<{ id: string; name: string }>>([]);
@@ -140,9 +141,9 @@ export const SalesPage: React.FC = () => {
     <div className="space-y-6">
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-bold text-slate-900">Sales Management & Reports</h1>
+          <h1 className="text-2xl font-bold text-slate-900">{t(language, 'salesPageTitle')}</h1>
           <p className="text-sm text-slate-500 mt-0.5">
-            Track cash, UPI, bank transfer, and customer credit sales with automatic totals.
+            {t(language, 'salesPageDesc')}
           </p>
         </div>
 

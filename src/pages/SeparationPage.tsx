@@ -1,6 +1,8 @@
 import React, { useEffect, useState, useCallback } from 'react';
 import { Scale, ArrowLeftRight, Home, Wallet, Plus, Trash2 } from 'lucide-react';
 import { apiFetch, formatInr } from '../lib/api';
+import { useAuth } from '../context/AuthContext';
+import { t } from '../lib/i18n';
 import { EntryKind, FinancialSummary, Transaction } from '../types';
 
 const NON_OPERATING_KINDS: Array<{ value: EntryKind; label: string; help: string }> = [
@@ -37,6 +39,7 @@ const NON_OPERATING_KINDS: Array<{ value: EntryKind; label: string; help: string
 ];
 
 export const SeparationPage: React.FC = () => {
+  const { language } = useAuth();
   const [summary, setSummary] = useState<FinancialSummary | null>(null);
   const [transactions, setTransactions] = useState<Transaction[]>([]);
   const [entryKind, setEntryKind] = useState<EntryKind>('household_withdrawal');
@@ -97,11 +100,10 @@ export const SeparationPage: React.FC = () => {
     <div className="space-y-6">
       <div>
         <h1 className="text-2xl font-bold text-slate-900">
-          Household-Business Financial Separation Engine
+          {t(language, 'separationTitle')}
         </h1>
         <p className="text-sm text-slate-500 mt-0.5">
-          Clearly separates business operating profit from household withdrawals, personal capital,
-          loans, and cash/bank transfers.
+          {t(language, 'separationDesc')}
         </p>
       </div>
 

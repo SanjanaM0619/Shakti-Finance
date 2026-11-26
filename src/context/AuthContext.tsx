@@ -40,7 +40,10 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [businessProfile, setBusinessProfile] = useState<BusinessProfile | null>(null);
   const [schemeExtra, setSchemeExtra] = useState<SchemeExtra | null>(null);
   const [loading, setLoading] = useState(true);
-  const [language, setLanguageState] = useState<Language>('en');
+  const [language, setLanguageState] = useState<Language>(() => {
+    const saved = localStorage.getItem('shakti_finance_lang');
+    return saved === 'kn' ? 'kn' : 'en';
+  });
   const [isOnline, setIsOnline] = useState<boolean>(navigator.onLine);
   const [offlineQueue, setOfflineQueue] = useState<OfflineTransactionDraft[]>(getOfflineQueue());
   const [unreadNotifications, setUnreadNotifications] = useState(0);
@@ -151,6 +154,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   const setLanguage = (lang: Language) => {
     setLanguageState(lang);
+    localStorage.setItem('shakti_finance_lang', lang);
     if (user && navigator.onLine) {
       apiFetch('/api/auth/profile', {
         method: 'PUT',

@@ -2,6 +2,7 @@ import React, { useEffect, useState, useCallback } from 'react';
 import { FileSpreadsheet, Download, Plus, Trash2, Upload, Repeat } from 'lucide-react';
 import { apiFetch, formatInr } from '../lib/api';
 import { useAuth } from '../context/AuthContext';
+import { t } from '../lib/i18n';
 import { exportLedgerReportPdf, exportTransactionsCsv } from '../lib/exportUtils';
 import { FinancialSummary, Transaction } from '../types';
 
@@ -19,7 +20,7 @@ const EXPENSE_CATEGORIES = [
 ];
 
 export const ExpensesPage: React.FC = () => {
-  const { businessProfile, isOnline, queueOfflineTx } = useAuth();
+  const { businessProfile, language, isOnline, queueOfflineTx } = useAuth();
   const [transactions, setTransactions] = useState<Transaction[]>([]);
   const [summary, setSummary] = useState<FinancialSummary | null>(null);
   const [suppliers, setSuppliers] = useState<Array<{ id: string; name: string }>>([]);
@@ -131,9 +132,9 @@ export const ExpensesPage: React.FC = () => {
     <div className="space-y-6">
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-bold text-slate-900">Business Expense Management</h1>
+          <h1 className="text-2xl font-bold text-slate-900">{t(language, 'expensesPageTitle')}</h1>
           <p className="text-sm text-slate-500 mt-0.5">
-            Track operating costs, recurring overheads, supplier credit bills, and receipt uploads.
+            {t(language, 'expensesPageDesc')}
           </p>
         </div>
         <div className="flex flex-wrap gap-2">

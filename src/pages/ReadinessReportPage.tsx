@@ -1,9 +1,12 @@
 import React, { useEffect, useState } from 'react';
 import { Download, FileSpreadsheet, ShieldAlert, AlertCircle, Landmark } from 'lucide-react';
 import { apiFetch, formatInr } from '../lib/api';
+import { useAuth } from '../context/AuthContext';
+import { t } from '../lib/i18n';
 import { exportReadinessReportPdf } from '../lib/exportUtils';
 
 export const ReadinessReportPage: React.FC = () => {
+  const { language } = useAuth();
   const [report, setReport] = useState<any | null>(null);
 
   useEffect(() => {
@@ -51,9 +54,9 @@ export const ReadinessReportPage: React.FC = () => {
     <div className="max-w-5xl mx-auto space-y-6">
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-bold text-slate-900">Business Financial Readiness Report</h1>
+          <h1 className="text-2xl font-bold text-slate-900">{t(language, 'readinessTitle')}</h1>
           <p className="text-sm text-slate-500 mt-0.5">
-            Organized enterprise & ledger profile prepared for approaching banks, SHG federations, or scheme officers.
+            {t(language, 'readinessDesc')}
           </p>
         </div>
         <div className="flex flex-wrap gap-2">

@@ -2,6 +2,8 @@ import React, { useEffect, useState, useCallback } from 'react';
 import { Link } from 'react-router-dom';
 import { Landmark, ExternalLink, Search, CheckCircle2, HelpCircle, XCircle } from 'lucide-react';
 import { apiFetch } from '../lib/api';
+import { useAuth } from '../context/AuthContext';
+import { t } from '../lib/i18n';
 import { SchemeItem } from '../types';
 
 const ASSISTANCE_LABELS: Record<string, string> = {
@@ -14,6 +16,7 @@ const ASSISTANCE_LABELS: Record<string, string> = {
 };
 
 export const SchemesPage: React.FC = () => {
+  const { language } = useAuth();
   const [schemes, setSchemes] = useState<SchemeItem[]>([]);
   const [stateFilter, setStateFilter] = useState('all');
   const [typeFilter, setTypeFilter] = useState('all');
@@ -62,10 +65,10 @@ export const SchemesPage: React.FC = () => {
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
           <h1 className="text-2xl font-bold text-slate-900">
-            Verified Government Scheme & Opportunity Finder
+            {t(language, 'schemesTitle')}
           </h1>
           <p className="text-sm text-slate-500 mt-0.5">
-            Central and Karnataka schemes matched transparently against your business profile. Clearly distinguishes loans, subsidies, subventions, and training.
+            {t(language, 'schemesDesc')}
           </p>
         </div>
         <Link to="/onboarding" className="btn-secondary text-xs shrink-0">
