@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useCallback } from 'react';
-import { Truck, Plus, AlertTriangle, CheckCircle2 } from 'lucide-react';
+import { Truck, Plus, AlertTriangle, CheckCircle2, FileSpreadsheet } from 'lucide-react';
 import { apiFetch, formatInr } from '../lib/api';
 
 interface SupplierRecord {
@@ -59,6 +59,21 @@ export const SuppliersPage: React.FC = () => {
   const totalPayable = suppliers.reduce((s, sup) => s + sup.outstanding, 0);
   const today = new Date().toISOString().slice(0, 10);
 
+  const exportPayablesCsv = () => {
+    const rows = [
+      ['Supplier', 'Category', 'Phone', 'Outstanding Payable (INR)', 'Overdue (INR)'],
+      ...suppliers.map((s) => [s.name, s.category, s.phone, s.outstanding, s.overdueAmount]),
+    ];
+    const csv = rows.map((r) => r.map((v) => `"${String(v ?? '').replace(/"/g, '""')}"`).join(',')).join('\n');
+    const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `shakti-supplier-payables-${today}.csv`;
+    a.click();
+    URL.revokeObjectURL(url);
+  };
+
   return (
     <div className="space-y-6">
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
@@ -68,9 +83,14 @@ export const SuppliersPage: React.FC = () => {
             Manage suppliers, unpaid purchase bills, payment deadlines, and outgoing obligations.
           </p>
         </div>
-        <div className="card-surface px-4 py-2.5 text-right">
-          <p className="text-xs text-slate-500">Total Unpaid Supplier Bills</p>
-          <p className="text-lg font-bold text-slate-900">{formatInr(totalPayable)}</p>
+        <div className="flex items-center gap-3">
+          <button type="button" onClick={exportPayablesCsv} className="btn-secondary text-xs">
+            <FileSpreadsheet className="w-4 h-4" /> Export Payables CSV
+          </button>
+          <div className="card-surface px-4 py-2.5 text-right">
+            <p className="text-xs text-slate-500">Total Unpaid Supplier Bills</p>
+            <p className="text-lg font-bold text-slate-900">{formatInr(totalPayable)}</p>
+          </div>
         </div>
       </div>
 

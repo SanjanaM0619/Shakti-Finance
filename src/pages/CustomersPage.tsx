@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useCallback } from 'react';
-import { Users, Plus, AlertTriangle, CheckCircle2 } from 'lucide-react';
+import { Users, Plus, AlertTriangle, CheckCircle2, FileSpreadsheet } from 'lucide-react';
 import { apiFetch, formatInr } from '../lib/api';
 
 interface CustomerRecord {
@@ -64,6 +64,21 @@ export const CustomersPage: React.FC = () => {
   const totalReceivable = customers.reduce((s, c) => s + c.outstanding, 0) +
     unlinkedBills.reduce((s, b) => s + (b.amount - b.paid_amount), 0);
 
+  const exportReceivablesCsv = () => {
+    const rows = [
+      ['Customer', 'Phone', 'Total Billed (INR)', 'Total Paid (INR)', 'Outstanding (INR)', 'Overdue (INR)'],
+      ...customers.map((c) => [c.name, c.phone, c.totalBilled, c.totalPaid, c.outstanding, c.overdueAmount]),
+    ];
+    const csv = rows.map((r) => r.map((v) => `"${String(v ?? '').replace(/"/g, '""')}"`).join(',')).join('\n');
+    const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `shakti-customer-receivables-${new Date().toISOString().slice(0, 10)}.csv`;
+    a.click();
+    URL.revokeObjectURL(url);
+  };
+
   return (
     <div className="space-y-6">
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
@@ -73,9 +88,14 @@ export const CustomersPage: React.FC = () => {
             Track pending customer payments, overdue balances, and partial settlements. Pending credit is excluded from Available Cash until received.
           </p>
         </div>
-        <div className="card-surface px-4 py-2.5 text-right">
-          <p className="text-xs text-slate-500">Total Pending Receivables</p>
-          <p className="text-lg font-bold text-blue-700">{formatInr(totalReceivable)}</p>
+        <div className="flex items-center gap-3">
+          <button type="button" onClick={exportReceivablesCsv} className="btn-secondary text-xs">
+            <FileSpreadsheet className="w-4 h-4" /> Export Receivables CSV
+          </button>
+          <div className="card-surface px-4 py-2.5 text-right">
+            <p className="text-xs text-slate-500">Total Pending Receivables</p>
+            <p className="text-lg font-bold text-blue-700">{formatInr(totalReceivable)}</p>
+          </div>
         </div>
       </div>
 

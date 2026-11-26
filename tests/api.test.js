@@ -151,6 +151,23 @@ test('Full end-to-end API workflow: demo login, bookkeeping, offline sync, AI as
   assert.equal(schemes.status, 200);
   assert.ok(schemes.body.schemes.length >= 8);
 
+  const checklistSave = await req('/api/intel/schemes/pmfme/application', {
+    method: 'PUT',
+    headers: authHeaders,
+    body: JSON.stringify({
+      status: 'preparing',
+      checklist_progress: { 0: true, 1: true },
+      notes: 'Prepared Aadhaar and FSSAI undertaking',
+      deadline_date: '2026-12-15',
+    }),
+  });
+  assert.equal(checklistSave.status, 200);
+  assert.equal(checklistSave.body.application.status, 'preparing');
+
+  const voiceCfg = await req('/api/intel/voice/config', { headers: authHeaders });
+  assert.equal(voiceCfg.status, 200);
+  assert.deepEqual(voiceCfg.body.supportedLanguages, ['en', 'kn']);
+
   const readiness = await req('/api/finance/readiness-report', { headers: authHeaders });
   assert.equal(readiness.status, 200);
   assert.ok(readiness.body.disclaimer.includes('NOT an official credit score'));

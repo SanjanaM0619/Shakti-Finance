@@ -170,7 +170,7 @@ export async function answerFinancialQuestion(userId, question) {
     ];
   }
 
-  return {
+  const result = {
     question: q,
     intent: matchedIntent,
     answer,
@@ -191,4 +191,42 @@ export async function answerFinancialQuestion(userId, question) {
     disclaimer:
       'Informational guidance calculated strictly from your recorded Shakti Finance data. Recommendations are not guaranteed financial outcomes or professional tax/legal advice.',
   };
+
+  // Optional LLM narrative polish when OPENAI_API_KEY is configured, strictly grounded in verifiedFactsUsed
+  if (process.env.OPENAI_API_KEY) {
+    try {
+      const llmRes = await fetch('https://api.openai.com/v1/chat/completions', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${process.env.OPENAI_API_KEY}`,
+        },
+        body: JSON.stringify({
+          model: 'gpt-4o-mini',
+          temperature: 0.2,
+          messages: [
+            {
+              role: 'system',
+              content: `You are Shakti Finance's financial guide for a woman micro-entrepreneur (${user.name || 'Entrepreneur'}).
+Rewrite the verified calculation summary clearly and empathetically in ${user.preferred_language === 'kn' ? 'Kannada and simple English' : 'simple, encouraging English'}.
+STRICT RULE: Use ONLY the exact numbers provided in Verified Facts and Draft Answer. Never invent transactions, balances, or percentages.`,
+            },
+            {
+              role: 'user',
+              content: `Question: ${q}\nDraft Answer: ${answer}\nVerified Facts: ${JSON.stringify(result.verifiedFactsUsed)}`,
+            },
+          ],
+        }),
+      });
+      if (llmRes.ok) {
+        const data = await llmRes.json();
+        const polished = data.choices?.[0]?.message?.content?.trim();
+        if (polished) result.answer = polished;
+      }
+    } catch {
+      // Fall back safely to verified deterministic answer
+    }
+  }
+
+  return result;
 }
