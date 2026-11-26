@@ -18,6 +18,7 @@ import { SurplusPage } from './pages/SurplusPage';
 import { AssistantPage } from './pages/AssistantPage';
 import { SchemesPage } from './pages/SchemesPage';
 import { SchemeDetailPage } from './pages/SchemeDetailPage';
+import { ApplicationsPage } from './pages/ApplicationsPage';
 import { ReadinessReportPage } from './pages/ReadinessReportPage';
 import { LiteracyPage } from './pages/LiteracyPage';
 import { PricingPage } from './pages/PricingPage';
@@ -66,6 +67,7 @@ export const App: React.FC = () => {
             <Route path="/assistant" element={<AssistantPage />} />
             <Route path="/schemes" element={<SchemesPage />} />
             <Route path="/schemes/:id" element={<SchemeDetailPage />} />
+            <Route path="/applications" element={<ApplicationsPage />} />
             <Route path="/readiness-report" element={<ReadinessReportPage />} />
             <Route path="/literacy" element={<LiteracyPage />} />
             <Route path="/pricing" element={<PricingPage />} />

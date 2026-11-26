@@ -1,4 +1,6 @@
 import express from 'express';
+import multer from 'multer';
+import fs from 'node:fs';
 import { v4 as uuidv4 } from 'uuid';
 import { db } from '../db.js';
 import { requireAuth } from '../auth.js';
@@ -10,6 +12,11 @@ import { getUserNotifications } from '../engines/notificationEngine.js';
 const router = express.Router();
 router.use(requireAuth);
 
+const audioUpload = multer({
+  storage: multer.memoryStorage(),
+  limits: { fileSize: 10 * 1024 * 1024 },
+});
+
 // Voice NLP parsing + configuration status check
 router.get('/voice/config', (_req, res) => {
   return res.json({
@@ -19,7 +26,61 @@ router.get('/voice/config', (_req, res) => {
     note:
       process.env.SARVAM_API_KEY || process.env.OPENAI_API_KEY
         ? 'External Speech/LLM provider active.'
-        : 'Using browser Web Speech API + deterministic bilingual (Kannada/English) extractor. Add SARVAM_API_KEY or OPENAI_API_KEY in .env for cloud speech-to-text.',
+        : 'Using browser Web Speech API + deterministic bilingual (Kannada/English) extractor. Add SARVAM_API_KEY or OPENAI_API_KEY in .env for cloud audio transcription.',
+  });
+});
+
+// Optional cloud Speech-to-Text endpoint (Sarvam AI Saaras / OpenAI Whisper)
+router.post('/voice/transcribe', audioUpload.single('audio'), async (req, res) => {
+  if (!req.file) {
+    return res.status(400).json({ error: 'Audio recording file is required.' });
+  }
+  const language = req.body?.language === 'kn' ? 'kn-IN' : 'en-IN';
+
+  if (process.env.SARVAM_API_KEY) {
+    try {
+      const form = new FormData();
+      form.append('file', new Blob([req.file.buffer], { type: req.file.mimetype || 'audio/webm' }), 'recording.webm');
+      form.append('language_code', language);
+      form.append('model', 'saarika:v2');
+      const sr = await fetch('https://api.sarvam.ai/speech-to-text', {
+        method: 'POST',
+        headers: { 'api-subscription-key': process.env.SARVAM_API_KEY },
+        body: form,
+      });
+      if (sr.ok) {
+        const data = await sr.json();
+        return res.json({ transcript: data.transcript || '', provider: 'sarvam-ai' });
+      }
+    } catch {
+      // fall through
+    }
+  }
+
+  if (process.env.OPENAI_API_KEY) {
+    try {
+      const form = new FormData();
+      form.append('file', new Blob([req.file.buffer], { type: req.file.mimetype || 'audio/webm' }), 'recording.webm');
+      form.append('model', 'whisper-1');
+      form.append('language', req.body?.language === 'kn' ? 'kn' : 'en');
+      const wr = await fetch('https://api.openai.com/v1/audio/transcriptions', {
+        method: 'POST',
+        headers: { Authorization: `Bearer ${process.env.OPENAI_API_KEY}` },
+        body: form,
+      });
+      if (wr.ok) {
+        const data = await wr.json();
+        return res.json({ transcript: data.text || '', provider: 'openai-whisper' });
+      }
+    } catch {
+      // fall through
+    }
+  }
+
+  return res.status(501).json({
+    error:
+      'Cloud audio transcription requires SARVAM_API_KEY or OPENAI_API_KEY in .env. Please use the live Browser Microphone button or type your sentence directly.',
+    requiresConfiguration: true,
   });
 });
 

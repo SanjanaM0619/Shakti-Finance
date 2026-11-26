@@ -12,6 +12,7 @@ import {
   PiggyBank,
   MessageSquare,
   Landmark,
+  ClipboardCheck,
   FileText,
   BookOpen,
   Calculator,
@@ -78,6 +79,7 @@ export const AppShell: React.FC = () => {
       label: 'Govt Schemes & Growth',
       items: [
         { to: '/schemes', label: t(language, 'schemes'), icon: Landmark },
+        { to: '/applications', label: t(language, 'applications'), icon: ClipboardCheck },
         { to: '/readiness-report', label: t(language, 'readiness'), icon: FileText },
         { to: '/literacy', label: t(language, 'literacy'), icon: BookOpen },
       ],

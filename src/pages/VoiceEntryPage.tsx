@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { Mic, MicOff, Sparkles, CheckCircle2, AlertCircle, Send } from 'lucide-react';
+import { Mic, MicOff, Sparkles, CheckCircle2, AlertCircle, Send, Upload } from 'lucide-react';
 import { apiFetch, formatInr } from '../lib/api';
 import { useAuth } from '../context/AuthContext';
 
@@ -41,6 +41,8 @@ export const VoiceEntryPage: React.FC = () => {
   const [listening, setListening] = useState(false);
   const [speechSupported, setSpeechSupported] = useState(false);
   const [configNote, setConfigNote] = useState<string>('');
+  const [cloudConfigured, setCloudConfigured] = useState(false);
+  const [uploadError, setUploadError] = useState<string | null>(null);
 
   const [parsing, setParsing] = useState(false);
   const [drafts, setDrafts] = useState<ParsedTxDraft[]>([]);
@@ -55,8 +57,11 @@ export const VoiceEntryPage: React.FC = () => {
     const SR = (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
     setSpeechSupported(Boolean(SR));
 
-    apiFetch<{ note: string }>('/api/intel/voice/config')
-      .then((res) => setConfigNote(res.note))
+    apiFetch<{ note: string; sarvamConfigured: boolean; openaiConfigured: boolean }>('/api/intel/voice/config')
+      .then((res) => {
+        setConfigNote(res.note);
+        setCloudConfigured(Boolean(res.sarvamConfigured || res.openaiConfigured));
+      })
       .catch(() => setConfigNote('Offline mode: browser text entry available.'));
   }, []);
 
@@ -87,6 +92,23 @@ export const VoiceEntryPage: React.FC = () => {
     recognitionRef.current = rec;
     setListening(true);
     rec.start();
+  };
+
+  const handleAudioUpload = async (file: File | null) => {
+    if (!file) return;
+    setUploadError(null);
+    const fd = new FormData();
+    fd.append('audio', file);
+    fd.append('language', speechLang.startsWith('kn') ? 'kn' : 'en');
+    try {
+      const res = await apiFetch<{ transcript: string }>('/api/intel/voice/transcribe', {
+        method: 'POST',
+        body: fd,
+      });
+      setTranscript(res.transcript);
+    } catch (err: any) {
+      setUploadError(err.message);
+    }
   };
 
   const handleAnalyze = async () => {
@@ -195,23 +217,38 @@ export const VoiceEntryPage: React.FC = () => {
       {/* Voice Input Card */}
       <section className="card-surface p-6 space-y-4">
         <div className="flex flex-wrap items-center justify-between gap-3">
-          <button
-            type="button"
-            onClick={toggleMic}
-            disabled={!speechSupported}
-            className={`inline-flex items-center gap-2 px-5 py-3 rounded-xl font-semibold text-sm transition-all cursor-pointer ${
-              listening
-                ? 'bg-rose-600 text-white animate-pulse'
-                : 'bg-blue-600 text-white hover:bg-blue-700 disabled:bg-slate-300'
-            }`}
-          >
-            {listening ? <MicOff className="w-4 h-4" /> : <Mic className="w-4 h-4" />}
-            {listening
-              ? 'Listening... Tap to Stop'
-              : speechSupported
-                ? `Speak Now (${speechLang === 'kn-IN' ? 'ಕನ್ನಡ' : 'English'})`
-                : 'Browser Mic Unavailable — Type Below'}
-          </button>
+          <div className="flex flex-wrap items-center gap-2">
+            <button
+              type="button"
+              onClick={toggleMic}
+              disabled={!speechSupported}
+              className={`inline-flex items-center gap-2 px-5 py-3 rounded-xl font-semibold text-sm transition-all cursor-pointer ${
+                listening
+                  ? 'bg-rose-600 text-white animate-pulse'
+                  : 'bg-blue-600 text-white hover:bg-blue-700 disabled:bg-slate-300'
+              }`}
+            >
+              {listening ? <MicOff className="w-4 h-4" /> : <Mic className="w-4 h-4" />}
+              {listening
+                ? 'Listening... Tap to Stop'
+                : speechSupported
+                  ? `Speak Now (${speechLang === 'kn-IN' ? 'ಕನ್ನಡ' : 'English'})`
+                  : 'Browser Mic Unavailable — Type Below'}
+            </button>
+
+            <label
+              className="btn-secondary text-xs py-2.5 cursor-pointer"
+              title={cloudConfigured ? 'Transcribe audio via Sarvam AI / Whisper' : 'Requires SARVAM_API_KEY or OPENAI_API_KEY in .env'}
+            >
+              <Upload className="w-4 h-4" /> Upload Voice Clip
+              <input
+                type="file"
+                accept="audio/*"
+                onChange={(e) => handleAudioUpload(e.target.files?.[0] || null)}
+                className="hidden"
+              />
+            </label>
+          </div>
 
           <div className="flex flex-wrap gap-1.5">
             {SAMPLE_PROMPTS.map((sp) => (
@@ -226,6 +263,12 @@ export const VoiceEntryPage: React.FC = () => {
             ))}
           </div>
         </div>
+
+        {uploadError && (
+          <div className="p-2.5 rounded-lg bg-amber-50 border border-amber-200 text-xs text-amber-900">
+            {uploadError}
+          </div>
+        )}
 
         <div>
           <label className="label-text">Spoken / Natural-Language Description</label>
