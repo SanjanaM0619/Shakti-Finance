@@ -1,15 +1,16 @@
 {
-  "name": "shakti-finance",
-  "version": "1.0.0",
+  "name": "shakti-finance-mern",
+  "version": "2.0.0",
   "private": true,
   "type": "module",
-  "description": "Shakti Finance - Integrated Financial Management, Intelligence and Government Support Platform for Women Entrepreneurs",
+  "description": "Shakti Finance (MERN Stack) — Integrated Financial Management, Intelligence & Government Support Platform for Women Entrepreneurs",
   "scripts": {
-    "dev": "concurrently \"npm:dev:server\" \"npm:dev:client\"",
-    "dev:server": "node --watch server/index.js",
-    "dev:client": "vite",
-    "build": "vite build",
-    "start": "node server/index.js",
+    "dev": "concurrently \"npm:dev:backend\" \"npm:dev:frontend\"",
+    "dev:backend": "node --watch backend/index.js",
+    "dev:frontend": "vite --config frontend/vite.config.ts frontend",
+    "build": "vite build --config frontend/vite.config.ts frontend",
+    "typecheck": "tsc -p frontend/tsconfig.json --noEmit",
+    "start": "node backend/index.js",
     "test": "node --test tests/*.test.js"
   },
   "dependencies": {
@@ -21,6 +22,8 @@
     "jspdf": "^2.5.2",
     "jspdf-autotable": "^3.8.4",
     "lucide-react": "^0.468.0",
+    "mongodb-memory-server": "^10.1.2",
+    "mongoose": "^8.9.5",
     "multer": "^1.4.5-lts.1",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
@@ -33,7 +36,6 @@
     "@types/react-dom": "^18.3.1",
     "@vitejs/plugin-react": "^4.3.4",
     "concurrently": "^9.1.2",
-    "postcss": "^8.4.49",
     "tailwindcss": "^4.0.0",
     "typescript": "^5.7.2",
     "vite": "^6.0.6"

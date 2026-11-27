@@ -1,14 +1,17 @@
-# Dependencies & build
+# Dependencies & builds
 node_modules/
 dist/
+frontend/dist/
 build/
 
 # Environment & secrets
 .env
 .env.local
+backend/.env
 
-# SQLite database & uploaded receipts
+# Local databases & uploaded receipts
 data/
+database/mongo-data/
 uploads/
 *.sqlite
 *.db
